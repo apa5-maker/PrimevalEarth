@@ -1,11 +1,12 @@
 -- PRIMEVAL EARTH | ALL IN ONE
 -- MINI PE BUTTON + PLAYER ESP + FOOD ESP + SELF HP
--- AUTO DRINK + AUTO EAT + AUTO ZONE
+-- AUTO DRINK + AUTO EAT + AUTO ZONE + ANTI AFK
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local UIS = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
 local LocalPlayer = Players.LocalPlayer
 
 -- Matikan versi sebelumnya
@@ -34,7 +35,8 @@ local Settings = {
     SelfHP = true,
     Drink = false,
     Eat = false,
-    Zone = false
+    Zone = false,
+    AntiAFK = true
 }
 
 local SkipZone = false
@@ -130,7 +132,7 @@ bubbleStroke.Parent = bubble
 -- Menu
 local panel = Instance.new("Frame")
 panel.Name = "FeaturePanel"
-panel.Size = UDim2.fromOffset(185, 330)
+panel.Size = UDim2.fromOffset(136, 239)
 panel.BackgroundColor3 = Color3.fromRGB(25, 30, 40)
 panel.Visible = false
 panel.Active = true
@@ -139,12 +141,12 @@ panel.Parent = gui
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 10)
 
 local heading = Instance.new("TextLabel")
-heading.Size = UDim2.new(1, 0, 0, 35)
+heading.Size = UDim2.new(1, 0, 0, 23)
 heading.BackgroundColor3 = Color3.fromRGB(45, 65, 90)
 heading.Text = "PRIMEVAL EARTH"
 heading.TextColor3 = Color3.new(1, 1, 1)
 heading.Font = Enum.Font.GothamBold
-heading.TextSize = 12
+heading.TextSize = 9
 heading.Parent = panel
 
 Instance.new("UICorner", heading).CornerRadius = UDim.new(0, 10)
@@ -159,13 +161,13 @@ local function UpdatePanelPosition()
     local x = pos.X + 35
     local y = pos.Y
 
-    if x + 185 > screen.X then
-        x = pos.X - 190
+    if x + 136 > screen.X then
+        x = pos.X - 141
     end
 
     panel.Position = UDim2.fromOffset(
-        math.clamp(x, 0, math.max(0, screen.X - 185)),
-        math.clamp(y, 0, math.max(0, screen.Y - 330))
+        math.clamp(x, 0, math.max(0, screen.X - 136)),
+        math.clamp(y, 0, math.max(0, screen.Y - 239))
     )
 end
 
@@ -261,10 +263,10 @@ local ToggleRefresh = {}
 
 local function AddToggle(name, key, y)
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, -16, 0, 32)
-    button.Position = UDim2.fromOffset(8, y)
+    button.Size = UDim2.new(1, -10, 0, 23)
+    button.Position = UDim2.fromOffset(5, y)
     button.Font = Enum.Font.GothamBold
-    button.TextSize = 12
+    button.TextSize = 9
     button.TextColor3 = Color3.new(1, 1, 1)
     button.Parent = panel
 
@@ -289,41 +291,36 @@ local function AddToggle(name, key, y)
     Update()
 end
 
-AddToggle("ESP", "ESP", 40)
-AddToggle("FOOD ESP", "Food", 76)
-AddToggle("SELF HP", "SelfHP", 112)
-AddToggle("AUTO DRINK", "Drink", 148)
-AddToggle("AUTO EAT", "Eat", 184)
-AddToggle("AUTO ZONE", "Zone", 220)
+AddToggle("ESP", "ESP", 26)
+AddToggle("FOOD ESP", "Food", 52)
+AddToggle("SELF HP", "SelfHP", 78)
+AddToggle("AUTO DRINK", "Drink", 104)
+AddToggle("AUTO EAT", "Eat", 130)
+AddToggle("AUTO ZONE", "Zone", 156)
+AddToggle("ANTI AFK", "AntiAFK", 182)
 
--- Skip Zone
 local skip = Instance.new("TextButton")
-skip.Size = UDim2.new(1, -16, 0, 28)
-skip.Position = UDim2.fromOffset(8, 258)
+skip.Size = UDim2.new(1, -10, 0, 23)
+skip.Position = UDim2.fromOffset(5, 208)
 skip.Text = "SKIP ZONE"
 skip.TextColor3 = Color3.new(1, 1, 1)
 skip.BackgroundColor3 = Color3.fromRGB(65, 95, 160)
 skip.Font = Enum.Font.GothamBold
-skip.TextSize = 12
+skip.TextSize = 9
 skip.Parent = panel
-
 Instance.new("UICorner", skip).CornerRadius = UDim.new(0, 7)
-
 Connect(skip.MouseButton1Click, function()
     SkipZone = true
 end)
 
-local stop = Instance.new("TextButton")
-stop.Size = UDim2.new(1, -16, 0, 28)
-stop.Position = UDim2.fromOffset(8, 293)
-stop.Text = "STOP ALL"
-stop.TextColor3 = Color3.new(1, 1, 1)
-stop.BackgroundColor3 = Color3.fromRGB(100, 70, 70)
-stop.Font = Enum.Font.GothamBold
-stop.TextSize = 12
-stop.Parent = panel
-
-Instance.new("UICorner", stop).CornerRadius = UDim.new(0, 7)
+-- Anti AFK: menanggapi event idle saat toggle aktif.
+Connect(LocalPlayer.Idled, function()
+    if not Running or not Settings.AntiAFK then return end
+    pcall(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new(0, 0))
+    end)
+end)
 
 --------------------------------------------------
 -- PLAYER ESP
@@ -921,7 +918,7 @@ task.spawn(function()
 end)
 
 --------------------------------------------------
--- CLEANUP / STOP ALL
+-- CLEANUP (untuk reload script)
 --------------------------------------------------
 
 local function Cleanup()
@@ -935,6 +932,7 @@ local function Cleanup()
     Settings.Drink = false
     Settings.Eat = false
     Settings.Zone = false
+    Settings.AntiAFK = false
 
     _G.PEFeatureInstance = _G.PEFeatureInstance + 1
 
@@ -961,6 +959,5 @@ end
 
 _G.PrimevalAllCleanup = Cleanup
 
-Connect(stop.MouseButton1Click, Cleanup)
 
 print("Primeval Earth All-in-One Loaded!")
