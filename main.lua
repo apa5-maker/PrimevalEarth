@@ -142,11 +142,11 @@ Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 10)
 
 local heading = Instance.new("TextLabel")
 heading.Size = UDim2.new(1, 0, 0, 23)
-heading.BackgroundColor3 = Color3.fromRGB(45, 65, 90)
-heading.Text = "PRIMEVAL EARTH"
-heading.TextColor3 = Color3.new(1, 1, 1)
+heading.BackgroundColor3 = Color3.fromRGB(54, 34, 85)
+heading.Text = "sanyoo"
+heading.TextColor3 = Color3.fromRGB(210, 165, 255)
 heading.Font = Enum.Font.GothamBold
-heading.TextSize = 9
+heading.TextSize = 14
 heading.Parent = panel
 
 Instance.new("UICorner", heading).CornerRadius = UDim.new(0, 10)
@@ -296,8 +296,8 @@ AddToggle("FOOD ESP", "Food", 52)
 AddToggle("SELF HP", "SelfHP", 78)
 AddToggle("AUTO DRINK", "Drink", 104)
 AddToggle("AUTO EAT", "Eat", 130)
-AddToggle("AUTO ZONE", "Zone", 156)
-AddToggle("ANTI AFK", "AntiAFK", 182)
+AddToggle("ANTI AFK", "AntiAFK", 156)
+AddToggle("AUTO ZONE", "Zone", 182)
 
 local skip = Instance.new("TextButton")
 skip.Size = UDim2.new(1, -10, 0, 23)
