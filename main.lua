@@ -1,7 +1,9 @@
+
+
 --==================================================
--- SANYOO SC V2 | PRIMEVAL EARTH
--- ALL IN ONE + SUPER LOW GRAPHICS
--- SINGLE FILE VERSION
+-- SANYOO SC V3 | PRIMEVAL EARTH
+-- CATEGORY MENU + ALL IN ONE
+-- WATER ESP REMOVED
 --==================================================
 
 local Players = game:GetService("Players")
@@ -36,29 +38,29 @@ local Settings = {
     ESP = false,
     Food = false,
     SelfHP = true,
+
     Drink = false,
     Eat = false,
+    Rest = false,
     Zone = false,
-    AntiAFK = true,
 
     AntiLag = false,
     RemoveTrees = false,
     Fullbright = false,
     NoFog = false,
-    WaterESP = false
+
+    AntiAFK = true
 }
 
 local SkipZone = false
 
 local PlayerESP = {}
 local FoodESP = {}
-local WaterESP = {}
 
 local OwnHP = nil
 local Saved = {}
 
 local ScanID = 0
-local WaterID = 0
 
 local function Connect(signal, callback)
     local connection = signal:Connect(callback)
@@ -97,12 +99,12 @@ end
 
 local function HPColor(percent)
     if percent > 0.6 then
-        return Color3.fromRGB(0,255,80)
+        return Color3.fromRGB(0, 255, 80)
     elseif percent > 0.3 then
-        return Color3.fromRGB(255,220,0)
+        return Color3.fromRGB(255, 220, 0)
     end
 
-    return Color3.fromRGB(255,60,60)
+    return Color3.fromRGB(255, 60, 60)
 end
 
 local function Contains(name, words)
@@ -133,7 +135,7 @@ local function IsCharacter(obj)
 end
 
 --==================================================
--- GUI SANYOO MINI
+-- GUI PARENT
 --==================================================
 
 local parent = LP:WaitForChild("PlayerGui")
@@ -158,83 +160,332 @@ gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.Parent = parent
 
--- MINI BUTTON
+--==================================================
+-- MINI PE BUTTON
+--==================================================
 
 local bubble = Instance.new("TextButton")
 bubble.Name = "PEBubble"
-bubble.Size = UDim2.fromOffset(28,28)
-bubble.Position = UDim2.fromOffset(8,250)
-bubble.BackgroundColor3 = Color3.fromRGB(75,45,130)
-bubble.Text = "PE"
-bubble.TextColor3 = Color3.new(1,1,1)
-bubble.TextSize = 10
+bubble.Size = UDim2.fromOffset(30, 30)
+bubble.Position = UDim2.fromOffset(8, 250)
+bubble.BackgroundColor3 = Color3.fromRGB(18, 8, 12)
+bubble.Text = "SANYOO"
+bubble.TextColor3 = Color3.new(1, 1, 1)
+bubble.TextSize = 11
 bubble.Font = Enum.Font.GothamBold
 bubble.Active = true
 bubble.Parent = gui
 
-Instance.new("UICorner",bubble).CornerRadius =
-    UDim.new(1,0)
+Instance.new("UICorner", bubble).CornerRadius =
+    UDim.new(1, 0)
 
 local bubbleStroke = Instance.new("UIStroke")
-bubbleStroke.Color = Color3.fromRGB(190,130,255)
+bubbleStroke.Color = Color3.fromRGB(255, 20, 55)
 bubbleStroke.Thickness = 1
 bubbleStroke.Parent = bubble
 
--- PANEL
+--==================================================
+-- MAIN PANEL | DARK HACKER EDITION
+--==================================================
+
+local PANEL_W = 350
+local PANEL_H = 270
 
 local panel = Instance.new("Frame")
 panel.Name = "FeaturePanel"
-panel.Size = UDim2.fromOffset(136,258)
-panel.BackgroundColor3 = Color3.fromRGB(25,30,40)
+panel.Size = UDim2.fromOffset(PANEL_W, PANEL_H)
+panel.BackgroundColor3 = Color3.fromRGB(7, 8, 12)
 panel.Visible = false
 panel.Active = true
+panel.ClipsDescendants = true
 panel.Parent = gui
 
-Instance.new("UICorner",panel).CornerRadius =
-    UDim.new(0,10)
+Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 
-local heading = Instance.new("TextLabel")
-heading.Size = UDim2.new(1,0,0,24)
-heading.BackgroundColor3 = Color3.fromRGB(54,34,85)
-heading.Text = "SANYOO SC V2"
-heading.TextColor3 = Color3.fromRGB(210,165,255)
-heading.Font = Enum.Font.GothamBold
-heading.TextSize = 12
+local panelStroke = Instance.new("UIStroke")
+panelStroke.Color = Color3.fromRGB(255, 24, 55)
+panelStroke.Thickness = 1.5
+panelStroke.Transparency = 0.08
+panelStroke.Parent = panel
+
+local panelGradient = Instance.new("UIGradient")
+panelGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 12, 18)),
+    ColorSequenceKeypoint.new(0.55, Color3.fromRGB(8, 8, 12)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 5, 10))
+})
+panelGradient.Rotation = 25
+panelGradient.Parent = panel
+
+local heading = Instance.new("Frame")
+heading.Name = "Header"
+heading.Size = UDim2.new(1, 0, 0, 46)
+heading.BackgroundColor3 = Color3.fromRGB(20, 7, 13)
+heading.BorderSizePixel = 0
 heading.Parent = panel
 
-Instance.new("UICorner",heading).CornerRadius =
-    UDim.new(0,10)
+local headerGradient = Instance.new("UIGradient")
+headerGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(70, 5, 22)),
+    ColorSequenceKeypoint.new(0.55, Color3.fromRGB(22, 7, 14)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 8, 12))
+})
+headerGradient.Rotation = 0
+headerGradient.Parent = heading
 
--- SCROLL MENU
+local logoMark = Instance.new("Frame")
+logoMark.Name = "LogoMark"
+logoMark.Position = UDim2.fromOffset(10, 8)
+logoMark.Size = UDim2.fromOffset(29, 29)
+logoMark.BackgroundColor3 = Color3.fromRGB(255, 20, 55)
+logoMark.BorderSizePixel = 0
+logoMark.Parent = heading
+Instance.new("UICorner", logoMark).CornerRadius = UDim.new(0, 8)
+
+local logoText = Instance.new("TextLabel")
+logoText.Size = UDim2.fromScale(1, 1)
+logoText.BackgroundTransparency = 1
+logoText.Text = "S"
+logoText.TextColor3 = Color3.new(1, 1, 1)
+logoText.Font = Enum.Font.GothamBlack
+logoText.TextSize = 20
+logoText.Parent = logoMark
+
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Position = UDim2.fromOffset(47, 5)
+title.Size = UDim2.new(1, -125, 0, 22)
+title.BackgroundTransparency = 1
+title.Text = "SANYOO.exe"
+title.TextColor3 = Color3.fromRGB(255, 245, 247)
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 15
+title.Parent = heading
+
+local subtitle = Instance.new("TextLabel")
+subtitle.Position = UDim2.fromOffset(48, 26)
+subtitle.Size = UDim2.new(1, -125, 0, 13)
+subtitle.BackgroundTransparency = 1
+subtitle.Text = "PRIMEVAL EARTH  /  DARK SYSTEM"
+subtitle.TextColor3 = Color3.fromRGB(255, 65, 90)
+subtitle.TextXAlignment = Enum.TextXAlignment.Left
+subtitle.Font = Enum.Font.Code
+subtitle.TextSize = 8
+subtitle.Parent = heading
+
+local statusDot = Instance.new("Frame")
+statusDot.Position = UDim2.new(1, -66, 0, 15)
+statusDot.Size = UDim2.fromOffset(7, 7)
+statusDot.BackgroundColor3 = Color3.fromRGB(255, 35, 65)
+statusDot.BorderSizePixel = 0
+statusDot.Parent = heading
+Instance.new("UICorner", statusDot).CornerRadius = UDim.new(1, 0)
+
+local statusText = Instance.new("TextLabel")
+statusText.Position = UDim2.new(1, -55, 0, 10)
+statusText.Size = UDim2.fromOffset(32, 15)
+statusText.BackgroundTransparency = 1
+statusText.Text = "READY"
+statusText.TextColor3 = Color3.fromRGB(255, 95, 115)
+statusText.Font = Enum.Font.Code
+statusText.TextSize = 9
+statusText.TextXAlignment = Enum.TextXAlignment.Left
+statusText.Parent = heading
+
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Position = UDim2.new(1, -24, 0, 6)
+closeButton.Size = UDim2.fromOffset(17, 17)
+closeButton.BackgroundColor3 = Color3.fromRGB(65, 10, 23)
+closeButton.Text = "×"
+closeButton.TextColor3 = Color3.fromRGB(255, 110, 130)
+closeButton.TextSize = 15
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = heading
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(0, 6)
+
+local headerLine = Instance.new("Frame")
+headerLine.Position = UDim2.new(0, 0, 1, -2)
+headerLine.Size = UDim2.new(1, 0, 0, 2)
+headerLine.BackgroundColor3 = Color3.fromRGB(255, 25, 55)
+headerLine.BorderSizePixel = 0
+headerLine.Parent = heading
+
+-- SIDEBAR
+local sidebar = Instance.new("Frame")
+sidebar.Name = "Sidebar"
+sidebar.Position = UDim2.fromOffset(8, 54)
+sidebar.Size = UDim2.new(1, -16, 0, 32)
+sidebar.BackgroundColor3 = Color3.fromRGB(13, 12, 17)
+sidebar.BorderSizePixel = 0
+sidebar.Parent = panel
+Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 9)
+
+local sidebarStroke = Instance.new("UIStroke")
+sidebarStroke.Color = Color3.fromRGB(65, 20, 31)
+sidebarStroke.Thickness = 1
+sidebarStroke.Transparency = 0.2
+sidebarStroke.Parent = sidebar
+
+local sidePadding = Instance.new("UIPadding")
+sidePadding.PaddingTop = UDim.new(0, 4)
+sidePadding.PaddingBottom = UDim.new(0, 4)
+sidePadding.PaddingLeft = UDim.new(0, 6)
+sidePadding.PaddingRight = UDim.new(0, 6)
+sidePadding.Parent = sidebar
+
+local sideLayout = Instance.new("UIListLayout")
+sideLayout.FillDirection = Enum.FillDirection.Horizontal
+sideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+sideLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+sideLayout.Padding = UDim.new(0, 3)
+sideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+sideLayout.Parent = sidebar
+
+-- CONTENT AREA
+local contentHead = Instance.new("Frame")
+contentHead.Name = "ContentHeader"
+contentHead.Position = UDim2.fromOffset(8, 92)
+contentHead.Size = UDim2.new(1, -16, 0, 27)
+contentHead.BackgroundColor3 = Color3.fromRGB(18, 13, 19)
+contentHead.BorderSizePixel = 0
+contentHead.Parent = panel
+Instance.new("UICorner", contentHead).CornerRadius = UDim.new(0, 7)
+
+local contentAccent = Instance.new("Frame")
+contentAccent.Size = UDim2.fromOffset(3, 15)
+contentAccent.Position = UDim2.fromOffset(8, 6)
+contentAccent.BackgroundColor3 = Color3.fromRGB(255, 25, 55)
+contentAccent.BorderSizePixel = 0
+contentAccent.Parent = contentHead
+
+local contentTitle = Instance.new("TextLabel")
+contentTitle.Name = "SectionTitle"
+contentTitle.Position = UDim2.fromOffset(17, 0)
+contentTitle.Size = UDim2.new(1, -28, 1, 0)
+contentTitle.BackgroundTransparency = 1
+contentTitle.Text = "ESP MODULES"
+contentTitle.TextColor3 = Color3.fromRGB(245, 235, 239)
+contentTitle.TextXAlignment = Enum.TextXAlignment.Left
+contentTitle.Font = Enum.Font.GothamBold
+contentTitle.TextSize = 10
+contentTitle.Parent = contentHead
 
 local scroll = Instance.new("ScrollingFrame")
 scroll.Name = "SANYOO_SCROLL"
-scroll.Position = UDim2.fromOffset(0,25)
-scroll.Size = UDim2.new(1,0,1,-25)
-scroll.BackgroundTransparency = 1
+scroll.Position = UDim2.fromOffset(8, 125)
+scroll.Size = UDim2.new(1, -16, 1, -155)
+scroll.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+scroll.BackgroundTransparency = 0.15
 scroll.BorderSizePixel = 0
 scroll.ScrollBarThickness = 3
-scroll.CanvasSize = UDim2.fromOffset(0,355)
+scroll.ScrollBarImageColor3 = Color3.fromRGB(255, 30, 60)
+scroll.CanvasSize = UDim2.fromOffset(0, 0)
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 scroll.Parent = panel
+Instance.new("UICorner", scroll).CornerRadius = UDim.new(0, 8)
+
+local scrollStroke = Instance.new("UIStroke")
+scrollStroke.Color = Color3.fromRGB(45, 23, 31)
+scrollStroke.Thickness = 1
+scrollStroke.Parent = scroll
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0,3)
-layout.HorizontalAlignment =
-    Enum.HorizontalAlignment.Center
+layout.Padding = UDim.new(0, 8)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = scroll
 
-Connect(layout:GetPropertyChangedSignal(
-    "AbsoluteContentSize"
-),function()
-    scroll.CanvasSize = UDim2.fromOffset(
-        0,
-        layout.AbsoluteContentSize.Y + 8
-    )
+local padding = Instance.new("UIPadding")
+padding.PaddingTop = UDim.new(0, 9)
+padding.PaddingBottom = UDim.new(0, 9)
+padding.PaddingLeft = UDim.new(0, 8)
+padding.PaddingRight = UDim.new(0, 8)
+padding.Parent = scroll
+
+local footer = Instance.new("TextLabel")
+footer.Name = "Footer"
+footer.Position = UDim2.new(0, 10, 1, -14)
+footer.Size = UDim2.new(1, -20, 0, 10)
+footer.BackgroundTransparency = 1
+footer.Text = "SANYOO LABS  //  BUILD 03"
+footer.TextColor3 = Color3.fromRGB(110, 75, 85)
+footer.TextXAlignment = Enum.TextXAlignment.Left
+footer.Font = Enum.Font.Code
+footer.TextSize = 8
+footer.Parent = panel
+
+Connect(closeButton.MouseButton1Click, function()
+    panel.Visible = false
 end)
 
---==================================================
--- POSITION MENU
+-- PANEL DRAG: hanya melalui handle khusus di area kosong header.
+-- Tombol fitur dan permukaan panel tidak pernah memulai drag.
+local panelDragging = false
+local panelDragStart
+local panelStartPosition
+local panelActiveInput
+
+local dragHandle = Instance.new("TextButton")
+dragHandle.Name = "HeaderDragHandle"
+dragHandle.Position = UDim2.fromOffset(82, 0)
+dragHandle.Size = UDim2.new(1, -112, 0, 46)
+dragHandle.BackgroundTransparency = 1
+dragHandle.Text = ""
+dragHandle.AutoButtonColor = false
+dragHandle.Active = true
+dragHandle.ZIndex = 20
+dragHandle.Parent = heading
+
+local function BeginPanelDrag(input)
+    if input.UserInputType ~= Enum.UserInputType.Touch
+        and input.UserInputType ~= Enum.UserInputType.MouseButton1 then
+        return
+    end
+
+    panelDragging = true
+    panelDragStart = input.Position
+    panelStartPosition = panel.AbsolutePosition
+    panelActiveInput = input
+end
+
+Connect(dragHandle.InputBegan, BeginPanelDrag)
+
+Connect(UIS.InputChanged, function(input)
+    if not panelDragging or not panelActiveInput then return end
+
+    local valid = input == panelActiveInput
+    if panelActiveInput.UserInputType == Enum.UserInputType.MouseButton1
+        and input.UserInputType == Enum.UserInputType.MouseMovement then
+        valid = true
+    end
+    if not valid then return end
+
+    local delta = input.Position - panelDragStart
+    local camera = WS.CurrentCamera
+    local screen = camera and camera.ViewportSize
+    local x = panelStartPosition.X + delta.X
+    local y = panelStartPosition.Y + delta.Y
+
+    if screen then
+        x = math.clamp(x, 0, math.max(0, screen.X - PANEL_W))
+        y = math.clamp(y, 0, math.max(0, screen.Y - PANEL_H))
+    end
+    panel.Position = UDim2.fromOffset(x, y)
+end)
+
+Connect(UIS.InputEnded, function(input)
+    if input == panelActiveInput
+        or (panelActiveInput
+            and panelActiveInput.UserInputType == Enum.UserInputType.MouseButton1
+            and input.UserInputType == Enum.UserInputType.MouseButton1) then
+        panelDragging = false
+        panelActiveInput = nil
+    end
+end)
+
+-- PANEL POSITION
 --==================================================
 
 local function UpdatePanelPosition()
@@ -244,112 +495,41 @@ local function UpdatePanelPosition()
     local screen = camera.ViewportSize
     local pos = bubble.AbsolutePosition
 
-    local x = pos.X + 35
+    local x = pos.X + 37
     local y = pos.Y
 
-    if x + 136 > screen.X then
-        x = pos.X - 141
+    if x + PANEL_W > screen.X then
+        x = pos.X - PANEL_W - 7
     end
 
     panel.Position = UDim2.fromOffset(
-        math.clamp(x,0,math.max(0,screen.X-136)),
-        math.clamp(y,0,math.max(0,screen.Y-258))
+        math.clamp(
+            x,
+            0,
+            math.max(0, screen.X - PANEL_W)
+        ),
+        math.clamp(
+            y,
+            0,
+            math.max(0, screen.Y - PANEL_H)
+        )
     )
 end
 
 --==================================================
--- DRAG BUTTON
+-- MINI BUTTON: POSISI TETAP, HANYA UNTUK BUKA/TUTUP PANEL
 --==================================================
 
-local dragging = false
-local moved = false
-local dragStart
-local startPosition
-local activeInput
+local panelHasOpened = false
 
-Connect(bubble.InputBegan,function(input)
-    if input.UserInputType ==
-        Enum.UserInputType.Touch
-        or input.UserInputType ==
-        Enum.UserInputType.MouseButton1 then
-
-        dragging = true
-        moved = false
-        dragStart = input.Position
-        startPosition = bubble.AbsolutePosition
-        activeInput = input
-    end
-end)
-
-Connect(UIS.InputChanged,function(input)
-    if not dragging then return end
-
-    local valid = input == activeInput
-
-    if activeInput
-        and activeInput.UserInputType ==
-        Enum.UserInputType.MouseButton1
-        and input.UserInputType ==
-        Enum.UserInputType.MouseMovement then
-
-        valid = true
-    end
-
-    if not valid then return end
-
-    local delta = input.Position - dragStart
-
-    if delta.Magnitude > 6 then
-        moved = true
-    end
-
-    if moved then
-        local camera = WS.CurrentCamera
-        local screen = camera and camera.ViewportSize
-
-        local x = startPosition.X + delta.X
-        local y = startPosition.Y + delta.Y
-
-        if screen then
-            x = math.clamp(
-                x,0,math.max(0,screen.X-28)
-            )
-
-            y = math.clamp(
-                y,0,math.max(0,screen.Y-28)
-            )
-        end
-
-        bubble.Position = UDim2.fromOffset(x,y)
-        UpdatePanelPosition()
-    end
-end)
-
-Connect(UIS.InputEnded,function(input)
-    if input == activeInput
-        or (
-            activeInput
-            and activeInput.UserInputType ==
-            Enum.UserInputType.MouseButton1
-            and input.UserInputType ==
-            Enum.UserInputType.MouseButton1
-        ) then
-
-        dragging = false
-        activeInput = nil
-    end
-end)
-
-Connect(bubble.MouseButton1Click,function()
-    if moved then
-        moved = false
-        return
-    end
-
+Connect(bubble.MouseButton1Click, function()
     panel.Visible = not panel.Visible
 
-    if panel.Visible then
+    -- Atur posisi panel saat pertama kali dibuka saja.
+    -- Button pembuka tidak bisa di-drag dan posisinya tetap.
+    if panel.Visible and not panelHasOpened then
         UpdatePanelPosition()
+        panelHasOpened = true
     end
 end)
 
@@ -364,18 +544,11 @@ local TreeWords = {
     "foliage"
 }
 
-local WaterWords = {
-    "water",
-    "lake",
-    "pond",
-    "river"
-}
-
 local function IsTree(obj)
     local node = obj
 
     while node and node ~= WS do
-        if Contains(node.Name,TreeWords) then
+        if Contains(node.Name, TreeWords) then
             return true
         end
 
@@ -385,8 +558,8 @@ local function IsTree(obj)
     return false
 end
 
-local function SaveProperty(obj,prop,value)
-    local success,oldValue = pcall(function()
+local function SaveProperty(obj, prop, value)
+    local success, oldValue = pcall(function()
         return obj[prop]
     end)
 
@@ -405,7 +578,7 @@ local function SaveProperty(obj,prop,value)
     end)
 end
 
-local function RestoreProperty(obj,prop)
+local function RestoreProperty(obj, prop)
     local properties = Saved[obj]
 
     if properties and properties[prop] ~= nil then
@@ -437,26 +610,26 @@ local function Optimize(obj)
         end
 
         if Settings.AntiLag then
-            SaveProperty(obj,"CastShadow",false)
-            SaveProperty(obj,"Reflectance",0)
+            SaveProperty(obj, "CastShadow", false)
+            SaveProperty(obj, "Reflectance", 0)
             SaveProperty(
                 obj,
                 "Material",
                 Enum.Material.SmoothPlastic
             )
         else
-            RestoreProperty(obj,"CastShadow")
-            RestoreProperty(obj,"Reflectance")
-            RestoreProperty(obj,"Material")
+            RestoreProperty(obj, "CastShadow")
+            RestoreProperty(obj, "Reflectance")
+            RestoreProperty(obj, "Material")
         end
 
     elseif obj:IsA("Decal")
         or obj:IsA("Texture") then
 
         if Settings.AntiLag then
-            SaveProperty(obj,"Transparency",1)
+            SaveProperty(obj, "Transparency", 1)
         else
-            RestoreProperty(obj,"Transparency")
+            RestoreProperty(obj, "Transparency")
         end
 
     elseif obj:IsA("ParticleEmitter")
@@ -470,32 +643,32 @@ local function Optimize(obj)
         or obj:IsA("SurfaceLight") then
 
         if Settings.AntiLag then
-            SaveProperty(obj,"Enabled",false)
+            SaveProperty(obj, "Enabled", false)
         else
-            RestoreProperty(obj,"Enabled")
+            RestoreProperty(obj, "Enabled")
         end
     end
 end
 
 local function UpdateLighting()
     local options = {
-        {"Brightness",3,Settings.Fullbright},
-        {"ClockTime",14,Settings.Fullbright},
+        {"Brightness", 3, Settings.Fullbright},
+        {"ClockTime", 14, Settings.Fullbright},
 
         {
             "Ambient",
-            Color3.fromRGB(180,180,180),
+            Color3.fromRGB(180, 180, 180),
             Settings.Fullbright
         },
 
         {
             "OutdoorAmbient",
-            Color3.fromRGB(180,180,180),
+            Color3.fromRGB(180, 180, 180),
             Settings.Fullbright
         },
 
-        {"FogStart",100000,Settings.NoFog},
-        {"FogEnd",100000,Settings.NoFog},
+        {"FogStart", 100000, Settings.NoFog},
+        {"FogEnd", 100000, Settings.NoFog},
 
         {
             "GlobalShadows",
@@ -504,7 +677,7 @@ local function UpdateLighting()
         }
     }
 
-    for _,option in ipairs(options) do
+    for _, option in ipairs(options) do
         if option[3] then
             SaveProperty(
                 Lighting,
@@ -519,15 +692,15 @@ local function UpdateLighting()
         end
     end
 
-    for _,effect in ipairs(
+    for _, effect in ipairs(
         Lighting:GetDescendants()
     ) do
 
         if effect:IsA("PostEffect") then
             if Settings.AntiLag then
-                SaveProperty(effect,"Enabled",false)
+                SaveProperty(effect, "Enabled", false)
             else
-                RestoreProperty(effect,"Enabled")
+                RestoreProperty(effect, "Enabled")
             end
         end
     end
@@ -538,7 +711,7 @@ local function RefreshGraphics()
     local id = ScanID
 
     task.spawn(function()
-        for i,obj in ipairs(
+        for i, obj in ipairs(
             WS:GetDescendants()
         ) do
 
@@ -546,7 +719,7 @@ local function RefreshGraphics()
                 return
             end
 
-            pcall(Optimize,obj)
+            pcall(Optimize, obj)
 
             if i % 250 == 0 then
                 task.wait()
@@ -560,187 +733,261 @@ local function RefreshGraphics()
 end
 
 --==================================================
--- WATER ESP
+-- CATEGORY SYSTEM | DARK HACKER UI
 --==================================================
 
-local function ClearWater()
-    for _,marker in ipairs(WaterESP) do
-        pcall(function()
-            marker:Destroy()
-        end)
-    end
-
-    table.clear(WaterESP)
-end
-
-local function RefreshWater()
-    WaterID = WaterID + 1
-    local id = WaterID
-
-    ClearWater()
-
-    if not Settings.WaterESP then return end
-
-    task.spawn(function()
-        local count = 0
-
-        for i,obj in ipairs(
-            WS:GetDescendants()
-        ) do
-
-            if not Alive()
-                or id ~= WaterID
-                or not Settings.WaterESP then
-                return
-            end
-
-            if (
-                obj:IsA("BasePart")
-                or obj:IsA("Model")
-            )
-                and Contains(obj.Name,WaterWords)
-                and not IsCharacter(obj) then
-
-                local root = GetRoot(obj)
-
-                if obj:IsA("BasePart") then
-                    root = obj
-                end
-
-                if root then
-                    local bb = Instance.new("BillboardGui")
-                    bb.Name = "SANYOO_WATER_ESP"
-                    bb.Adornee = root
-                    bb.Size = UDim2.fromOffset(95,26)
-                    bb.StudsOffset = Vector3.new(0,3,0)
-                    bb.AlwaysOnTop = true
-                    bb.Parent = gui
-
-                    local label = Instance.new("TextLabel")
-                    label.Size = UDim2.fromScale(1,1)
-                    label.BackgroundTransparency = 1
-                    label.Text = "WATER"
-                    label.TextColor3 =
-                        Color3.fromRGB(0,190,255)
-                    label.TextStrokeTransparency = 0
-                    label.TextSize = 12
-                    label.Font = Enum.Font.GothamBold
-                    label.Parent = bb
-
-                    table.insert(WaterESP,bb)
-
-                    count = count + 1
-
-                    if count >= 80 then
-                        break
-                    end
-                end
-            end
-
-            if i % 300 == 0 then
-                task.wait()
-            end
-        end
-    end)
-end
-
---==================================================
--- MENU TOGGLES
---==================================================
-
+local Categories = {}
+local CurrentCategory = "ESP"
 local ToggleRefresh = {}
 
-local function AddToggle(name,key)
+local CategoryInfo = {
+    ESP = {Icon = "◈", Title = "ESP MODULES"},
+    FARM = {Icon = "⌁", Title = "AUTOMATION"},
+    GRAPHICS = {Icon = "▧", Title = "VISUAL SYSTEM"},
+    SETTINGS = {Icon = "⚙", Title = "SYSTEM SETTINGS"}
+}
+
+local function ShowCategory(category)
+    CurrentCategory = category
+    local info = CategoryInfo[category]
+    contentTitle.Text = info and info.Title or string.upper(category)
+
+    for name, button in pairs(Categories) do
+        local active = name == category
+        button.BackgroundColor3 = active
+            and Color3.fromRGB(75, 9, 27)
+            or Color3.fromRGB(20, 16, 22)
+        button.TextColor3 = active
+            and Color3.fromRGB(255, 90, 115)
+            or Color3.fromRGB(165, 151, 160)
+        local accent = button:FindFirstChild("ActiveBar")
+        if accent then accent.Visible = active end
+        local stroke = button:FindFirstChildOfClass("UIStroke")
+        if stroke then
+            stroke.Color = active
+                and Color3.fromRGB(255, 25, 60)
+                or Color3.fromRGB(48, 29, 37)
+        end
+    end
+
+    for _, child in ipairs(scroll:GetChildren()) do
+        if child:IsA("TextButton") then
+            child.Visible = child:GetAttribute("Category") == category
+        end
+    end
+    scroll.CanvasPosition = Vector2.zero
+end
+
+local function AddCategory(name, label, order)
+    local info = CategoryInfo[name] or {Icon = "•"}
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.LayoutOrder = order
+    button.Size = UDim2.new(0, 77, 0, 24)
+    button.BackgroundColor3 = Color3.fromRGB(20, 16, 22)
+    button.BorderSizePixel = 0
+    button.Text = info.Icon .. "  " .. label
+    button.TextColor3 = Color3.fromRGB(165, 151, 160)
+    button.TextSize = 8
+    button.TextXAlignment = Enum.TextXAlignment.Center
+    button.Font = Enum.Font.GothamBold
+    button.Parent = sidebar
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 7)
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(48, 29, 37)
+    stroke.Thickness = 1
+    stroke.Parent = button
+
+    local activeBar = Instance.new("Frame")
+    activeBar.Name = "ActiveBar"
+    activeBar.Position = UDim2.new(0.12, 0, 1, -3)
+    activeBar.Size = UDim2.new(0.76, 0, 0, 2)
+    activeBar.BackgroundColor3 = Color3.fromRGB(255, 25, 60)
+    activeBar.BorderSizePixel = 0
+    activeBar.Visible = false
+    activeBar.Parent = button
+    Instance.new("UICorner", activeBar).CornerRadius = UDim.new(1, 0)
+
+    Categories[name] = button
+    Connect(button.MouseButton1Click, function() ShowCategory(name) end)
+end
+
+AddCategory("ESP", "ESP", 1)
+AddCategory("FARM", "AUTO FARM", 2)
+AddCategory("GRAPHICS", "GRAPHICS", 3)
+AddCategory("SETTINGS", "SETTINGS", 4)
+
+local function AddToggle(name, key, category, order)
     local button = Instance.new("TextButton")
     button.Name = key
-    button.Size = UDim2.new(1,-10,0,23)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 9
-    button.TextColor3 = Color3.new(1,1,1)
+    button.LayoutOrder = order
+    button.Size = UDim2.new(1, -4, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(23, 18, 24)
+    button.BorderSizePixel = 0
+    button.Text = ""
+    button:SetAttribute("Category", category)
     button.Parent = scroll
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 
-    Instance.new("UICorner",button).CornerRadius =
-        UDim.new(0,7)
+    local stroke = Instance.new("UIStroke")
+    stroke.Name = "CardStroke"
+    stroke.Color = Color3.fromRGB(54, 30, 39)
+    stroke.Thickness = 1
+    stroke.Transparency = 0.15
+    stroke.Parent = button
+
+    local accent = Instance.new("Frame")
+    accent.Name = "CardAccent"
+    accent.Position = UDim2.fromOffset(0, 9)
+    accent.Size = UDim2.new(0, 3, 1, -18)
+    accent.BackgroundColor3 = Color3.fromRGB(90, 35, 48)
+    accent.BorderSizePixel = 0
+    accent.Parent = button
+    Instance.new("UICorner", accent).CornerRadius = UDim.new(1, 0)
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Name = "FeatureName"
+    titleLabel.Position = UDim2.fromOffset(13, 5)
+    titleLabel.Size = UDim2.new(1, -86, 0, 20)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = name
+    titleLabel.TextColor3 = Color3.fromRGB(238, 226, 232)
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 10
+    titleLabel.Parent = button
+
+    local detail = Instance.new("TextLabel")
+    detail.Name = "FeatureDetail"
+    detail.Position = UDim2.fromOffset(13, 25)
+    detail.Size = UDim2.new(1, -86, 0, 14)
+    detail.BackgroundTransparency = 1
+    detail.Text = "MODULE / " .. string.upper(key)
+    detail.TextColor3 = Color3.fromRGB(112, 92, 103)
+    detail.TextXAlignment = Enum.TextXAlignment.Left
+    detail.Font = Enum.Font.Code
+    detail.TextSize = 8
+    detail.Parent = button
+
+    local switch = Instance.new("Frame")
+    switch.Name = "Switch"
+    switch.AnchorPoint = Vector2.new(1, 0.5)
+    switch.Position = UDim2.new(1, -11, 0.5, 0)
+    switch.Size = UDim2.fromOffset(36, 20)
+    switch.BackgroundColor3 = Color3.fromRGB(48, 39, 46)
+    switch.BorderSizePixel = 0
+    switch.Parent = button
+    Instance.new("UICorner", switch).CornerRadius = UDim.new(1, 0)
+
+    local knob = Instance.new("Frame")
+    knob.Name = "Knob"
+    knob.Position = UDim2.fromOffset(3, 3)
+    knob.Size = UDim2.fromOffset(14, 14)
+    knob.BackgroundColor3 = Color3.fromRGB(185, 169, 178)
+    knob.BorderSizePixel = 0
+    knob.Parent = switch
+    Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
+
+    local stateText = Instance.new("TextLabel")
+    stateText.Name = "StateText"
+    stateText.AnchorPoint = Vector2.new(1, 1)
+    stateText.Position = UDim2.new(1, -11, 1, -3)
+    stateText.Size = UDim2.fromOffset(45, 10)
+    stateText.BackgroundTransparency = 1
+    stateText.Text = "DISABLED"
+    stateText.TextColor3 = Color3.fromRGB(120, 96, 107)
+    stateText.Font = Enum.Font.Code
+    stateText.TextSize = 7
+    stateText.TextXAlignment = Enum.TextXAlignment.Right
+    stateText.Parent = button
 
     local function Update()
-        local state = Settings[key]
-
-        button.Text = name ..
-            (state and " : ON" or " : OFF")
-
-        button.BackgroundColor3 = state
-            and Color3.fromRGB(36,140,83)
-            or Color3.fromRGB(145,55,60)
+        local enabled = Settings[key]
+        button.BackgroundColor3 = enabled
+            and Color3.fromRGB(38, 13, 22)
+            or Color3.fromRGB(23, 18, 24)
+        stroke.Color = enabled
+            and Color3.fromRGB(255, 25, 60)
+            or Color3.fromRGB(54, 30, 39)
+        accent.BackgroundColor3 = enabled
+            and Color3.fromRGB(255, 25, 60)
+            or Color3.fromRGB(90, 35, 48)
+        switch.BackgroundColor3 = enabled
+            and Color3.fromRGB(205, 12, 45)
+            or Color3.fromRGB(48, 39, 46)
+        knob.Position = enabled
+            and UDim2.fromOffset(23, 3)
+            or UDim2.fromOffset(3, 3)
+        knob.BackgroundColor3 = enabled
+            and Color3.fromRGB(255, 255, 255)
+            or Color3.fromRGB(185, 169, 178)
+        stateText.Text = enabled and "ENABLED" or "DISABLED"
+        stateText.TextColor3 = enabled
+            and Color3.fromRGB(255, 75, 100)
+            or Color3.fromRGB(120, 96, 107)
     end
 
     ToggleRefresh[key] = Update
-
-    Connect(button.MouseButton1Click,function()
+    Connect(button.MouseButton1Click, function()
         Settings[key] = not Settings[key]
-
         Update()
-
-        if key == "AntiLag"
-            or key == "RemoveTrees" then
-
+        if key == "AntiLag" or key == "RemoveTrees" then
             RefreshGraphics()
-
-        elseif key == "Fullbright"
-            or key == "NoFog" then
-
+        elseif key == "Fullbright" or key == "NoFog" then
             UpdateLighting()
-
-        elseif key == "WaterESP" then
-            RefreshWater()
         end
     end)
-
     Update()
-
     return button
 end
 
--- ORIGINAL FEATURES
+-- ESP CATEGORY
+AddToggle("PLAYER ESP", "ESP", "ESP", 1)
+AddToggle("FOOD ESP", "Food", "ESP", 2)
+AddToggle("SELF HEALTH", "SelfHP", "ESP", 3)
 
-AddToggle("PLAYER ESP","ESP")
-AddToggle("FOOD ESP","Food")
-AddToggle("SELF HP","SelfHP")
-AddToggle("AUTO DRINK","Drink")
-AddToggle("AUTO EAT","Eat")
-AddToggle("ANTI AFK","AntiAFK")
-AddToggle("AUTO ZONE","Zone")
-
--- SKIP ZONE
+-- AUTO FARM CATEGORY
+AddToggle("AUTO DRINK", "Drink", "FARM", 1)
+AddToggle("AUTO EAT", "Eat", "FARM", 2)
+AddToggle("AUTO REST", "Rest", "FARM", 3)
+AddToggle("AUTO ZONE", "Zone", "FARM", 4)
 
 local skip = Instance.new("TextButton")
-skip.Size = UDim2.new(1,-10,0,23)
-skip.Text = "SKIP ZONE"
-skip.TextColor3 = Color3.new(1,1,1)
-skip.BackgroundColor3 = Color3.fromRGB(65,95,160)
+skip.Name = "SkipZone"
+skip.LayoutOrder = 5
+skip.Size = UDim2.new(1, -4, 0, 42)
+skip.Text = "  »   SKIP CURRENT ZONE"
+skip.TextXAlignment = Enum.TextXAlignment.Left
+skip.TextColor3 = Color3.fromRGB(255, 220, 226)
+skip.BackgroundColor3 = Color3.fromRGB(78, 9, 27)
+skip.BorderSizePixel = 0
 skip.Font = Enum.Font.GothamBold
-skip.TextSize = 9
+skip.TextSize = 10
+skip:SetAttribute("Category", "FARM")
 skip.Parent = scroll
+Instance.new("UICorner", skip).CornerRadius = UDim.new(0, 8)
+local skipStroke = Instance.new("UIStroke")
+skipStroke.Color = Color3.fromRGB(255, 35, 65)
+skipStroke.Thickness = 1
+skipStroke.Parent = skip
+Connect(skip.MouseButton1Click, function() SkipZone = true end)
 
-Instance.new("UICorner",skip).CornerRadius =
-    UDim.new(0,7)
+-- GRAPHICS CATEGORY
+AddToggle("ANTI LAG", "AntiLag", "GRAPHICS", 1)
+AddToggle("REMOVE TREES", "RemoveTrees", "GRAPHICS", 2)
+AddToggle("FULLBRIGHT", "Fullbright", "GRAPHICS", 3)
+AddToggle("NO FOG", "NoFog", "GRAPHICS", 4)
 
-Connect(skip.MouseButton1Click,function()
-    SkipZone = true
-end)
+-- SETTINGS CATEGORY
+AddToggle("ANTI AFK", "AntiAFK", "SETTINGS", 1)
 
--- GRAPHICS FEATURES
+ShowCategory("ESP")
 
-AddToggle("ANTI LAG","AntiLag")
-AddToggle("REMOVE TREES","RemoveTrees")
-AddToggle("FULLBRIGHT","Fullbright")
-AddToggle("NO FOG","NoFog")
-AddToggle("WATER ESP","WaterESP")
-
---==================================================
 -- ANTI AFK
 --==================================================
 
-Connect(LP.Idled,function()
+Connect(LP.Idled, function()
     if not Alive()
         or not Settings.AntiAFK then
         return
@@ -748,7 +995,7 @@ Connect(LP.Idled,function()
 
     pcall(function()
         VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new(0,0))
+        VirtualUser:ClickButton2(Vector2.new(0, 0))
     end)
 end)
 
@@ -792,16 +1039,16 @@ local function SetupPlayer(player)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "PEPlayerESP"
     billboard.Adornee = root
-    billboard.Size = UDim2.fromOffset(200,65)
-    billboard.StudsOffset = Vector3.new(0,3,0)
+    billboard.Size = UDim2.fromOffset(200, 65)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
     billboard.Enabled = Settings.ESP
     billboard.Parent = gui
 
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.fromScale(1,1)
+    label.Size = UDim2.fromScale(1, 1)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(0,255,150)
+    label.TextColor3 = Color3.fromRGB(0, 255, 150)
     label.TextStrokeTransparency = 0
     label.Font = Enum.Font.GothamBold
     label.TextSize = 13
@@ -819,26 +1066,26 @@ end
 local function TrackPlayer(player)
     if player == LP then return end
 
-    Connect(player.CharacterAdded,function()
-        task.delay(0.5,function()
+    Connect(player.CharacterAdded, function()
+        task.delay(0.5, function()
             if Alive() then
                 SetupPlayer(player)
             end
         end)
     end)
 
-    Connect(player.CharacterRemoving,function()
+    Connect(player.CharacterRemoving, function()
         RemovePlayer(player)
     end)
 end
 
-for _,player in ipairs(Players:GetPlayers()) do
+for _, player in ipairs(Players:GetPlayers()) do
     TrackPlayer(player)
 end
 
-Connect(Players.PlayerAdded,TrackPlayer)
+Connect(Players.PlayerAdded, TrackPlayer)
 
-Connect(Players.PlayerRemoving,function(player)
+Connect(Players.PlayerRemoving, function(player)
     RemovePlayer(player)
 end)
 
@@ -854,7 +1101,7 @@ local function IsFood(obj)
     local name = string.lower(obj.Name)
 
     return name:match("^meat%d*$") ~= nil
-        or Contains(name,{
+        or Contains(name, {
             "carcass",
             "corpse",
             "meat",
@@ -896,8 +1143,8 @@ local function SetupFood(obj)
     local highlight = Instance.new("Highlight")
     highlight.Name = "PEFoodHighlight"
     highlight.Adornee = obj
-    highlight.FillColor = Color3.fromRGB(255,150,0)
-    highlight.OutlineColor = Color3.new(1,1,1)
+    highlight.FillColor = Color3.fromRGB(255, 150, 0)
+    highlight.OutlineColor = Color3.new(1, 1, 1)
     highlight.FillTransparency = 0.5
     highlight.DepthMode =
         Enum.HighlightDepthMode.AlwaysOnTop
@@ -907,16 +1154,16 @@ local function SetupFood(obj)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "PEFoodInfo"
     billboard.Adornee = root
-    billboard.Size = UDim2.fromOffset(180,65)
-    billboard.StudsOffset = Vector3.new(0,3,0)
+    billboard.Size = UDim2.fromOffset(180, 65)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
     billboard.Enabled = Settings.Food
     billboard.Parent = gui
 
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.fromScale(1,1)
+    label.Size = UDim2.fromScale(1, 1)
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255,150,0)
+    label.TextColor3 = Color3.fromRGB(255, 150, 0)
     label.TextStrokeTransparency = 0
     label.TextSize = 13
     label.Font = Enum.Font.GothamBold
@@ -934,7 +1181,7 @@ end
 -- INITIAL FOOD SCAN
 
 task.spawn(function()
-    for i,obj in ipairs(WS:GetDescendants()) do
+    for i, obj in ipairs(WS:GetDescendants()) do
         if not Alive() then return end
 
         if IsFood(obj) then
@@ -947,7 +1194,7 @@ task.spawn(function()
     end
 end)
 
-Connect(WS.DescendantAdded,function(obj)
+Connect(WS.DescendantAdded, function(obj)
     task.defer(function()
         if not Alive() or not obj.Parent then
             return
@@ -959,12 +1206,13 @@ Connect(WS.DescendantAdded,function(obj)
 
         if Settings.AntiLag
             or Settings.RemoveTrees then
-            pcall(Optimize,obj)
+
+            pcall(Optimize, obj)
         end
     end)
 end)
 
-Connect(WS.DescendantRemoving,function(obj)
+Connect(WS.DescendantRemoving, function(obj)
     if FoodESP[obj] then
         RemoveFood(obj)
     end
@@ -985,7 +1233,7 @@ local function SetupOwnHP()
     local character = LP.Character
     if not character then return end
 
-    local head = character:FindFirstChild("Head",true)
+    local head = character:FindFirstChild("Head", true)
         or GetRoot(character)
 
     if not head or not head:IsA("BasePart") then
@@ -1001,40 +1249,40 @@ local function SetupOwnHP()
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "PEOwnHealth"
     billboard.Adornee = head
-    billboard.Size = UDim2.fromOffset(140,38)
-    billboard.StudsOffset = Vector3.new(0,4,0)
+    billboard.Size = UDim2.fromOffset(140, 38)
+    billboard.StudsOffset = Vector3.new(0, 4, 0)
     billboard.AlwaysOnTop = true
     billboard.Parent = gui
 
     local background = Instance.new("Frame")
     background.Name = "BarBg"
-    background.Size = UDim2.new(1,0,0,12)
-    background.Position = UDim2.fromOffset(0,22)
+    background.Size = UDim2.new(1, 0, 0, 12)
+    background.Position = UDim2.fromOffset(0, 22)
     background.BackgroundColor3 =
-        Color3.fromRGB(45,45,45)
+        Color3.fromRGB(45, 45, 45)
     background.BorderSizePixel = 0
     background.Parent = billboard
 
-    Instance.new("UICorner",background).CornerRadius =
-        UDim.new(1,0)
+    Instance.new("UICorner", background).CornerRadius =
+        UDim.new(1, 0)
 
     local fill = Instance.new("Frame")
     fill.Name = "Fill"
-    fill.Size = UDim2.fromScale(1,1)
+    fill.Size = UDim2.fromScale(1, 1)
     fill.BackgroundColor3 =
-        Color3.fromRGB(0,255,80)
+        Color3.fromRGB(0, 255, 80)
     fill.BorderSizePixel = 0
     fill.Parent = background
 
-    Instance.new("UICorner",fill).CornerRadius =
-        UDim.new(1,0)
+    Instance.new("UICorner", fill).CornerRadius =
+        UDim.new(1, 0)
 
     local label = Instance.new("TextLabel")
     label.Name = "HealthText"
-    label.Size = UDim2.new(1,0,0,20)
+    label.Size = UDim2.new(1, 0, 0, 20)
     label.BackgroundTransparency = 1
     label.Text = "HP: ..."
-    label.TextColor3 = Color3.new(1,1,1)
+    label.TextColor3 = Color3.new(1, 1, 1)
     label.TextStrokeTransparency = 0
     label.Font = Enum.Font.GothamBold
     label.TextSize = 13
@@ -1067,13 +1315,13 @@ local function UpdateOwnHP()
 
     if not humanoid then
         label.Text = "HP: N/A"
-        fill.Size = UDim2.fromScale(0,1)
+        fill.Size = UDim2.fromScale(0, 1)
         return
     end
 
-    local hp = math.max(0,humanoid.Health)
-    local maxHP = math.max(1,humanoid.MaxHealth)
-    local percent = math.clamp(hp/maxHP,0,1)
+    local hp = math.max(0, humanoid.Health)
+    local maxHP = math.max(1, humanoid.MaxHealth)
+    local percent = math.clamp(hp / maxHP, 0, 1)
 
     label.Text = string.format(
         "HP: %d / %d",
@@ -1081,7 +1329,7 @@ local function UpdateOwnHP()
         math.floor(maxHP)
     )
 
-    fill.Size = UDim2.fromScale(percent,1)
+    fill.Size = UDim2.fromScale(percent, 1)
     fill.BackgroundColor3 = HPColor(percent)
 end
 
@@ -1094,7 +1342,7 @@ task.spawn(function()
         pcall(function()
             local myRoot = GetMyRoot()
 
-            for _,player in ipairs(
+            for _, player in ipairs(
                 Players:GetPlayers()
             ) do
                 if player ~= LP and player.Character then
@@ -1102,7 +1350,7 @@ task.spawn(function()
                 end
             end
 
-            for player,data in pairs(PlayerESP) do
+            for player, data in pairs(PlayerESP) do
                 if not player.Parent
                     or not data.Character.Parent
                     or not data.Root.Parent then
@@ -1140,7 +1388,7 @@ task.spawn(function()
                 end
             end
 
-            for obj,data in pairs(FoodESP) do
+            for obj, data in pairs(FoodESP) do
                 if not obj.Parent
                     or not data.Root.Parent then
 
@@ -1180,7 +1428,7 @@ local function IsThisZoneGreen(targetPos)
     pcall(function()
         local folder = WS.MapResources.Zones
 
-        for _,zoneObj in pairs(
+        for _, zoneObj in pairs(
             folder:GetChildren()
         ) do
 
@@ -1212,40 +1460,40 @@ end
 
 local ZonesList = {
     {
-        Position = Vector3.new(-144.54,-102.15,1032.19),
-        Teleport = CFrame.new(-144.54,-109.15,1032.19)
+        Position = Vector3.new(-144.54, -102.15, 1032.19),
+        Teleport = CFrame.new(-144.54, -109.15, 1032.19)
     },
     {
-        Position = Vector3.new(-617.92,143.39,-1130.44),
-        Teleport = CFrame.new(-617.92,136.39,-1130.44)
+        Position = Vector3.new(-617.92, 143.39, -1130.44),
+        Teleport = CFrame.new(-617.92, 136.39, -1130.44)
     },
     {
-        Position = Vector3.new(1449.99,77.16,-677.59),
-        Teleport = CFrame.new(1449.99,70.16,-677.59)
+        Position = Vector3.new(1449.99, 77.16, -677.59),
+        Teleport = CFrame.new(1449.99, 70.16, -677.59)
     },
     {
-        Position = Vector3.new(276.03,75.50,-1029.02),
-        Teleport = CFrame.new(276.03,68.50,-1029.02)
+        Position = Vector3.new(276.03, 75.50, -1029.02),
+        Teleport = CFrame.new(276.03, 68.50, -1029.02)
     },
     {
-        Position = Vector3.new(-513.23,75.73,-430.79),
-        Teleport = CFrame.new(-513.23,68.73,-430.79)
+        Position = Vector3.new(-513.23, 75.73, -430.79),
+        Teleport = CFrame.new(-513.23, 68.73, -430.79)
     },
     {
-        Position = Vector3.new(1090.65,66.03,467.14),
-        Teleport = CFrame.new(1090.65,59.03,467.14)
+        Position = Vector3.new(1090.65, 66.03, 467.14),
+        Teleport = CFrame.new(1090.65, 59.03, 467.14)
     },
     {
-        Position = Vector3.new(209.25,-32.79,-359.19),
-        Teleport = CFrame.new(209.25,-39.79,-359.19)
+        Position = Vector3.new(209.25, -32.79, -359.19),
+        Teleport = CFrame.new(209.25, -39.79, -359.19)
     },
     {
-        Position = Vector3.new(-170.20,109.98,388.42),
-        Teleport = CFrame.new(-170.20,102.98,388.42)
+        Position = Vector3.new(-170.20, 109.98, 388.42),
+        Teleport = CFrame.new(-170.20, 102.98, 388.42)
     },
     {
-        Position = Vector3.new(-69.11,-61.16,-1493.54),
-        Teleport = CFrame.new(-69.11,-68.16,-1493.54)
+        Position = Vector3.new(-69.11, -61.16, -1493.54),
+        Teleport = CFrame.new(-69.11, -68.16, -1493.54)
     }
 }
 
@@ -1257,7 +1505,7 @@ task.spawn(function()
                 char:FindFirstChild("HumanoidRootPart")
 
             if hrp then
-                for i = 1,#ZonesList do
+                for i = 1, #ZonesList do
                     if not Alive()
                         or not Settings.Zone then
                         break
@@ -1281,7 +1529,7 @@ task.spawn(function()
                             if IsThisZoneGreen(
                                 zone.Position
                             )
-                                or tick()-startTime >= 12
+                                or tick() - startTime >= 12
                                 or SkipZone then
 
                                 SkipZone = false
@@ -1289,10 +1537,10 @@ task.spawn(function()
                             end
 
                             local shakeX =
-                                math.sin(tick()*8)*0.35
+                                math.sin(tick() * 8) * 0.35
 
                             local shakeZ =
-                                math.cos(tick()*8)*0.35
+                                math.cos(tick() * 8) * 0.35
 
                             if not hrp.Parent then
                                 break
@@ -1301,7 +1549,7 @@ task.spawn(function()
                             hrp.CFrame =
                                 zone.Teleport
                                 * CFrame.new(
-                                    shakeX,0,shakeZ
+                                    shakeX, 0, shakeZ
                                 )
 
                             hrp.AssemblyLinearVelocity =
@@ -1321,7 +1569,7 @@ task.spawn(function()
 
                     local anyLost = false
 
-                    for _,zone in ipairs(
+                    for _, zone in ipairs(
                         ZonesList
                     ) do
 
@@ -1363,9 +1611,9 @@ task.spawn(function()
 
     pcall(function()
         eatRemote = RS
-            :WaitForChild("Remotes",10)
-            :WaitForChild("Character",10)
-            :WaitForChild("Eat",10)
+            :WaitForChild("Remotes", 10)
+            :WaitForChild("Character", 10)
+            :WaitForChild("Eat", 10)
     end)
 
     while Alive() do
@@ -1383,14 +1631,14 @@ task.spawn(function()
                 local closestTree
                 local shortestDist = math.huge
 
-                for _,desc in ipairs(
+                for _, desc in ipairs(
                     env:GetDescendants()
                 ) do
 
                     if desc:IsA("Model")
                         and (
-                            string.find(desc.Name,"Tree")
-                            or string.find(desc.Name,"Bush")
+                            string.find(desc.Name, "Tree")
+                            or string.find(desc.Name, "Bush")
                         ) then
 
                         local targetPart = GetRoot(desc)
@@ -1442,10 +1690,42 @@ task.spawn(function()
 end)
 
 --==================================================
+-- AUTO REST (EXPERIMENTAL)
+--==================================================
+
+task.spawn(function()
+    while Alive() do
+        if Settings.Rest then
+            pcall(function()
+                local remotes = RS:FindFirstChild("Remotes")
+                local characterRemotes =
+                    remotes and remotes:FindFirstChild("Character")
+
+                local characterFunctions =
+                    characterRemotes
+                    and characterRemotes:FindFirstChild(
+                        "CharacterFunctions"
+                    )
+
+                if characterFunctions
+                    and characterFunctions:IsA("RemoteFunction") then
+
+                    characterFunctions:InvokeServer("Rest")
+                end
+            end)
+
+            task.wait(2)
+        else
+            task.wait(0.2)
+        end
+    end
+end)
+
+--==================================================
 -- LIGHTING EFFECT TRACKING
 --==================================================
 
-Connect(Lighting.DescendantAdded,function(obj)
+Connect(Lighting.DescendantAdded, function(obj)
     task.defer(function()
         if not Alive() or not obj.Parent then
             return
@@ -1454,7 +1734,7 @@ Connect(Lighting.DescendantAdded,function(obj)
         if Settings.AntiLag
             and obj:IsA("PostEffect") then
 
-            SaveProperty(obj,"Enabled",false)
+            SaveProperty(obj, "Enabled", false)
         end
     end)
 end)
@@ -1467,15 +1747,13 @@ local function Cleanup()
     if not Running then return end
 
     Running = false
-
     ScanID = ScanID + 1
-    WaterID = WaterID + 1
 
     for key in pairs(Settings) do
         Settings[key] = false
     end
 
-    for _,connection in ipairs(Connections) do
+    for _, connection in ipairs(Connections) do
         pcall(function()
             connection:Disconnect()
         end)
@@ -1490,10 +1768,9 @@ local function Cleanup()
     end
 
     RemoveOwnHP()
-    ClearWater()
 
-    for obj,properties in pairs(Saved) do
-        for prop,value in pairs(properties) do
+    for obj, properties in pairs(Saved) do
+        for prop, value in pairs(properties) do
             pcall(function()
                 obj[prop] = value
             end)
@@ -1509,4 +1786,5 @@ end
 
 _G.PrimevalAllCleanup = Cleanup
 
-print("SANYOO SC V2 ALL IN ONE LOADED!")
+print("SANYOO SC V3 CATEGORY MENU LOADED!")
+
