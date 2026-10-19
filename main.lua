@@ -517,19 +517,23 @@ local function UpdatePanelPosition()
 end
 
 --==================================================
--- MINI BUTTON: POSISI TETAP, HANYA UNTUK BUKA/TUTUP PANEL
+-- MINI BUTTON: PANEL OTOMATIS DI TENGAH SAAT DIBUKA
 --==================================================
-
-local panelHasOpened = false
 
 Connect(bubble.MouseButton1Click, function()
     panel.Visible = not panel.Visible
 
-    -- Atur posisi panel saat pertama kali dibuka saja.
-    -- Button pembuka tidak bisa di-drag dan posisinya tetap.
-    if panel.Visible and not panelHasOpened then
-        UpdatePanelPosition()
-        panelHasOpened = true
+    if panel.Visible then
+        local camera = WS.CurrentCamera
+
+        if camera then
+            local screen = camera.ViewportSize
+
+            panel.Position = UDim2.fromOffset(
+                math.max(0, (screen.X - PANEL_W) / 2),
+                math.max(0, (screen.Y - PANEL_H) / 2)
+            )
+        end
     end
 end)
 
