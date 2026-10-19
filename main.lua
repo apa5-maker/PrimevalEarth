@@ -1690,34 +1690,100 @@ task.spawn(function()
 end)
 
 --==================================================
--- AUTO REST (EXPERIMENTAL)
+-- QUEST TRACKER + AUTO REST (PAINPH10-STYLE)
+-- Detects quest text under PlayerGui.GameUI.QuestsFrame.
+-- Auto Rest only runs while a Rest quest is detected; toggle stays ON.
 --==================================================
+
+local CurrentQuest = "None"
+
+local function DetectCurrentQuest()
+    local playerGui = LP:FindFirstChild("PlayerGui")
+    local gameUI = playerGui and playerGui:FindFirstChild("GameUI")
+    local questsFrame = gameUI and gameUI:FindFirstChild("QuestsFrame")
+
+    if not questsFrame then
+        return "None"
+    end
+
+    for _, child in ipairs(questsFrame:GetChildren()) do
+        local textContent = string.lower(child.Name or "")
+
+        for _, desc in ipairs(child:GetDescendants()) do
+            if desc:IsA("TextLabel") or desc:IsA("TextButton") then
+                textContent = textContent .. " " .. string.lower(desc.Text or "")
+            end
+        end
+
+        if string.find(textContent, "eat something", 1, true) then
+            return "Eat"
+        elseif string.find(textContent, "drink water", 1, true) then
+            return "Drink"
+        elseif string.find(textContent, "rest", 1, true) then
+            return "Rest"
+        end
+    end
+
+    return "None"
+end
 
 task.spawn(function()
     while Alive() do
-        if Settings.Rest then
-            pcall(function()
-                local remotes = RS:FindFirstChild("Remotes")
-                local characterRemotes =
-                    remotes and remotes:FindFirstChild("Character")
+        local ok, detectedQuest = pcall(DetectCurrentQuest)
 
-                local characterFunctions =
-                    characterRemotes
-                    and characterRemotes:FindFirstChild(
-                        "CharacterFunctions"
-                    )
+        if ok then
+            -- Keep the AUTO REST toggle unchanged. Quest detection alone
+            -- controls whether resting is requested by the worker below.
+            CurrentQuest = detectedQuest
+        end
 
-                if characterFunctions
-                    and characterFunctions:IsA("RemoteFunction") then
+        task.wait(0.2)
+    end
+end)
 
-                    characterFunctions:InvokeServer("Rest")
+task.spawn(function()
+    local function getRestRemote()
+        local remotes = RS:WaitForChild("Remotes", 10)
+        local characterRemotes = remotes and remotes:WaitForChild("Character", 10)
+        return characterRemotes and characterRemotes:WaitForChild("Rest", 10)
+    end
+
+    local restRemote = getRestRemote()
+    local lastRequestedState = nil
+
+    while Alive() do
+        -- Only request resting while Auto Rest is enabled and the Rest quest is active.
+        local shouldRest = (Settings.Rest == true and CurrentQuest == "Rest")
+
+        if not restRemote or not restRemote.Parent then
+            restRemote = getRestRemote()
+            lastRequestedState = nil
+        end
+
+        -- Jangan kirim perintah apa pun saat toggle baru dinyalakan.
+        -- Mulai rest hanya ketika quest Rest terdeteksi; kirim false hanya
+        -- kalau script sebelumnya memang sudah mengaktifkan rest.
+        local shouldSendRequest = shouldRest or (lastRequestedState == true and not shouldRest)
+        if restRemote and shouldSendRequest and shouldRest ~= lastRequestedState then
+            local ok, err = pcall(function()
+                if restRemote:IsA("RemoteFunction") then
+                    restRemote:InvokeServer(shouldRest)
+                elseif restRemote:IsA("RemoteEvent") then
+                    restRemote:FireServer(shouldRest)
+                else
+                    error("Character.Rest is not a RemoteFunction or RemoteEvent")
                 end
             end)
 
-            task.wait(2)
-        else
-            task.wait(0.2)
+            if ok then
+                lastRequestedState = shouldRest
+            else
+                warn("[SANYOO SC] Auto Rest failed: " .. tostring(err))
+                task.wait(1)
+            end
         end
+
+        task.wait(0.3)
     end
 end)
 
@@ -1787,4 +1853,5 @@ end
 _G.PrimevalAllCleanup = Cleanup
 
 print("SANYOO SC V3 CATEGORY MENU LOADED!")
+
 
