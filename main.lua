@@ -982,6 +982,106 @@ AddToggle("NO FOG", "NoFog", "GRAPHICS", 4)
 -- SETTINGS CATEGORY
 AddToggle("ANTI AFK", "AntiAFK", "SETTINGS", 1)
 
+-- PLAYER TELEPORT | choose a player, then move beside them
+local SelectedTeleportPlayer = nil
+
+local function AddActionButton(name, text, order, callback)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.LayoutOrder = order
+    button.Size = UDim2.new(1, -4, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(38, 13, 22)
+    button.BorderSizePixel = 0
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 220, 226)
+    button.TextWrapped = true
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 10
+    button:SetAttribute("Category", "SETTINGS")
+    button.Parent = scroll
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 35, 65)
+    stroke.Thickness = 1
+    stroke.Parent = button
+    Connect(button.MouseButton1Click, function()
+        if Alive() then callback(button) end
+    end)
+    return button
+end
+
+local function GetTeleportTargets()
+    local targets = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LP then
+            table.insert(targets, player)
+        end
+    end
+    table.sort(targets, function(a, b)
+        return string.lower(a.DisplayName .. " (" .. a.Name .. ")")
+            < string.lower(b.DisplayName .. " (" .. b.Name .. ")")
+    end)
+    return targets
+end
+
+local targetButton
+local function RefreshTeleportTarget()
+    local targets = GetTeleportTargets()
+    if #targets == 0 then
+        SelectedTeleportPlayer = nil
+        if targetButton then targetButton.Text = "PLAYER TARGET  |  No other players" end
+        return
+    end
+    local selectedIndex = 0
+    for i, player in ipairs(targets) do
+        if player == SelectedTeleportPlayer then selectedIndex = i break end
+    end
+    selectedIndex = (selectedIndex % #targets) + 1
+    SelectedTeleportPlayer = targets[selectedIndex]
+    if targetButton then
+        targetButton.Text = "SELECT PLAYER  |  " .. SelectedTeleportPlayer.DisplayName
+            .. " (@" .. SelectedTeleportPlayer.Name .. ")  •  tap to change"
+    end
+end
+
+targetButton = AddActionButton("TeleportPlayerTarget", "SELECT PLAYER  |  tap to choose", 2, function()
+    RefreshTeleportTarget()
+end)
+
+AddActionButton("TeleportToPlayer", "TELEPORT TO SELECTED PLAYER", 3, function(button)
+    local target = SelectedTeleportPlayer
+    if not target or target.Parent ~= Players then
+        button.Text = "TARGET LEFT  |  choose another player"
+        task.delay(1.5, function()
+            if button and button.Parent then button.Text = "TELEPORT TO SELECTED PLAYER" end
+        end)
+        return
+    end
+    local myRoot = GetMyRoot()
+    local targetRoot = GetRoot(target.Character)
+    if not myRoot or not targetRoot then
+        button.Text = "TELEPORT FAILED  |  character not ready"
+        task.delay(1.5, function()
+            if button and button.Parent then button.Text = "TELEPORT TO SELECTED PLAYER" end
+        end)
+        return
+    end
+    local ok = pcall(function()
+        myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 4)
+    end)
+    button.Text = ok and ("TELEPORTED  |  " .. target.DisplayName) or "TELEPORT FAILED"
+    task.delay(1.5, function()
+        if button and button.Parent then button.Text = "TELEPORT TO SELECTED PLAYER" end
+    end)
+end)
+
+Connect(Players.PlayerRemoving, function(player)
+    if player == SelectedTeleportPlayer then
+        SelectedTeleportPlayer = nil
+        RefreshTeleportTarget()
+    end
+end)
+
 ShowCategory("ESP")
 
 -- ANTI AFK
