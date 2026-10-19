@@ -10,7 +10,6 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local WS = game:GetService("Workspace")
 local Lighting = game:GetService("Lighting")
-local Terrain = WS:FindFirstChildOfClass("Terrain")
 local UIS = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
@@ -46,7 +45,7 @@ local Settings = {
     Zone = false,
 
     AntiLag = false,
-    FullOptimizer = true,
+    RemoveTrees = false,
     Fullbright = false,
     NoFog = false,
 
@@ -518,23 +517,19 @@ local function UpdatePanelPosition()
 end
 
 --==================================================
--- MINI BUTTON: PANEL OTOMATIS DI TENGAH SAAT DIBUKA
+-- MINI BUTTON: POSISI TETAP, HANYA UNTUK BUKA/TUTUP PANEL
 --==================================================
+
+local panelHasOpened = false
 
 Connect(bubble.MouseButton1Click, function()
     panel.Visible = not panel.Visible
 
-    if panel.Visible then
-        local camera = WS.CurrentCamera
-
-        if camera then
-            local screen = camera.ViewportSize
-
-            panel.Position = UDim2.fromOffset(
-                math.max(0, (screen.X - PANEL_W) / 2),
-                math.max(0, (screen.Y - PANEL_H) / 2)
-            )
-        end
+    -- Atur posisi panel saat pertama kali dibuka saja.
+    -- Button pembuka tidak bisa di-drag dan posisinya tetap.
+    if panel.Visible and not panelHasOpened then
+        UpdatePanelPosition()
+        panelHasOpened = true
     end
 end)
 
@@ -543,9 +538,10 @@ end)
 --==================================================
 
 local TreeWords = {
-    "tree", "pohon", "trunk", "foliage",
-    "leaf", "leaves", "bush", "plant", "grass",
-    "branch", "vegetation", "shrub", "fern"
+    "tree",
+    "pohon",
+    "trunk",
+    "foliage"
 }
 
 local function IsTree(obj)
@@ -600,7 +596,7 @@ local function Optimize(obj)
 
     if obj:IsA("BasePart") then
 
-        if Settings.FullOptimizer and IsTree(obj) then
+        if Settings.RemoveTrees and IsTree(obj) then
             SaveProperty(
                 obj,
                 "LocalTransparencyModifier",
@@ -613,7 +609,7 @@ local function Optimize(obj)
             )
         end
 
-        if Settings.AntiLag or Settings.FullOptimizer then
+        if Settings.AntiLag then
             SaveProperty(obj, "CastShadow", false)
             SaveProperty(obj, "Reflectance", 0)
             SaveProperty(
@@ -630,7 +626,7 @@ local function Optimize(obj)
     elseif obj:IsA("Decal")
         or obj:IsA("Texture") then
 
-        if Settings.AntiLag or Settings.FullOptimizer then
+        if Settings.AntiLag then
             SaveProperty(obj, "Transparency", 1)
         else
             RestoreProperty(obj, "Transparency")
@@ -646,7 +642,7 @@ local function Optimize(obj)
         or obj:IsA("SpotLight")
         or obj:IsA("SurfaceLight") then
 
-        if Settings.AntiLag or Settings.FullOptimizer then
+        if Settings.AntiLag then
             SaveProperty(obj, "Enabled", false)
         else
             RestoreProperty(obj, "Enabled")
@@ -677,7 +673,7 @@ local function UpdateLighting()
         {
             "GlobalShadows",
             false,
-            Settings.AntiLag or Settings.FullOptimizer
+            Settings.AntiLag
         }
     }
 
@@ -699,27 +695,12 @@ local function UpdateLighting()
     for _, effect in ipairs(
         Lighting:GetDescendants()
     ) do
+
         if effect:IsA("PostEffect") then
-            if Settings.AntiLag or Settings.FullOptimizer then
+            if Settings.AntiLag then
                 SaveProperty(effect, "Enabled", false)
             else
                 RestoreProperty(effect, "Enabled")
-            end
-        end
-    end
-
-    if Terrain then
-        local waterOptions = {
-            {"WaterWaveSize", 0},
-            {"WaterWaveSpeed", 0},
-            {"WaterReflectance", 0},
-            {"WaterTransparency", 1}
-        }
-        for _, option in ipairs(waterOptions) do
-            if Settings.FullOptimizer then
-                SaveProperty(Terrain, option[1], option[2])
-            else
-                RestoreProperty(Terrain, option[1])
             end
         end
     end
@@ -951,7 +932,7 @@ local function AddToggle(name, key, category, order)
     Connect(button.MouseButton1Click, function()
         Settings[key] = not Settings[key]
         Update()
-        if key == "AntiLag" or key == "FullOptimizer" then
+        if key == "AntiLag" or key == "RemoveTrees" then
             RefreshGraphics()
         elseif key == "Fullbright" or key == "NoFog" then
             UpdateLighting()
@@ -994,7 +975,7 @@ Connect(skip.MouseButton1Click, function() SkipZone = true end)
 
 -- GRAPHICS CATEGORY
 AddToggle("ANTI LAG", "AntiLag", "GRAPHICS", 1)
-AddToggle("FPS BOOST + FULL OPTIMIZER", "FullOptimizer", "GRAPHICS", 2)
+AddToggle("REMOVE TREES", "RemoveTrees", "GRAPHICS", 2)
 AddToggle("FULLBRIGHT", "Fullbright", "GRAPHICS", 3)
 AddToggle("NO FOG", "NoFog", "GRAPHICS", 4)
 
@@ -1324,7 +1305,7 @@ Connect(WS.DescendantAdded, function(obj)
         end
 
         if Settings.AntiLag
-            or Settings.FullOptimizer then
+            or Settings.RemoveTrees then
 
             pcall(Optimize, obj)
         end
@@ -1916,7 +1897,7 @@ Connect(Lighting.DescendantAdded, function(obj)
             return
         end
 
-        if (Settings.AntiLag or Settings.FullOptimizer)
+        if Settings.AntiLag
             and obj:IsA("PostEffect") then
 
             SaveProperty(obj, "Enabled", false)
@@ -1970,22 +1951,6 @@ local function Cleanup()
 end
 
 _G.PrimevalAllCleanup = Cleanup
-
---==================================================
--- FULL OPTIMIZER AUTO REFRESH (10 SECONDS)
--- Tidak memuat ulang main.lua agar script tidak berjalan ganda.
---==================================================
-
-RefreshGraphics()
-
-task.spawn(function()
-    while Alive() do
-        task.wait(10)
-        if Alive() and Settings.FullOptimizer then
-            RefreshGraphics()
-        end
-    end
-end)
 
 print("SANYOO SC V3 CATEGORY MENU LOADED!")
 
